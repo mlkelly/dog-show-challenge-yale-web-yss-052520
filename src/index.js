@@ -31,6 +31,7 @@ function showDogs(dogs){
 // display single dog
 function displayDog(dog){
     const tr = ce("tr")
+    tr.dataset.id = dog.id //helps label tr sections w dog, to make reading code easier
 
     const tdName = ce("td")
     tdName.innerText = dog.name
@@ -44,37 +45,15 @@ function displayDog(dog){
     const tdBtn = ce("td")
     const btn = ce("button")
     btn.innerText = "Edit"
+    btn.dataset.id = dog.id
 
     btn.addEventListener("click", () => {
         // when you click edit this will populate the form w current dog info
         dogForm[0].value = dog.name
         dogForm[1].value = dog.breed
         dogForm[2].value = dog.sex
+        dogForm[3].value = dog.id
 
-    })
-
-    dogForm.addEventListener("submit", () => {
-        event.preventDefault()
-        // debugger
-        // PATCH edits
-        let configObj = {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept":"application/json"
-            },
-            body: JSON.stringify({
-                name: event.target[0].value,
-                breed: event.target[1].value,
-                sex: event.target[2].value
-            })
-        }
-
-        // grab new dog and display
-        fetch(`http://localhost:3000/dogs/${dog.id}`, configObj)
-        // .then(fetchDogs())
-        // somethings not right 
-        
     })
 
     tdBtn.appendChild(btn)
@@ -82,21 +61,28 @@ function displayDog(dog){
     tBody.appendChild(tr)
 }
 
+dogForm.addEventListener("submit", () => {
+    event.preventDefault()
+    debugger
+    // PATCH edits
+    let configObj = {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept":"application/json"
+        },
+        body: JSON.stringify({
+            name: event.target[0].value,
+            breed: event.target[1].value,
+            sex: event.target[2].value
+        })
+    }
+
+    // grab new dog and display
+    fetch(`http://localhost:3000/dogs/${event.target[3].value}`, configObj)
+    .then(fetchDogs())
+    
+    dogForm.reset()
+})
+
 fetchDogs()
-
-function addDog(dog){
-    let row = document.createElement('tr')
-    row.innerHTML = `<td>${dog.name}</td> <td>${dog.breed}</td> <td>${dog.sex}</td> <td><button id='btn${dog.id}'>Edit</button></td>`
-
-    tableBody.appendChild(row)
-
-    let btn = document.querySelector(`button#btn${dog.id}`)
-
-    btn.addEventListener('click', () => {
-      form[0].value = dog.name
-      form[1].value = dog.breed
-      form[2].value = dog.sex
-      
-      currentDog = dog
-    })
-  }
